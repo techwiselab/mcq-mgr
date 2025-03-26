@@ -2,8 +2,8 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -13,6 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Extract Git tag
+        id: extract_tag
+        run: echo "TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -20,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t sagarmhatre/mcquery:1.6 .
+        run: docker build -t sagarmhatre/mcquery:${{ env.TAG }} .
 
       - name: Push Docker image
-        run: docker push sagarmhatre/mcquery:1.6
+        run: docker push sagarmhatre/mcquery:${{ env.TAG }}
