@@ -1,0 +1,48 @@
+/* Basic quiz container styling */
+/* #quiz-container {
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: sans-serif;
+  }
+   */
+  /* Each question "slide" - hidden by default */
+  .slide {
+    display: none;
+  }
+  .active-slide {
+    display: block; /* show only the active question */
+  }
+  
+  /* Style the question text */
+  .question {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Style for answer options */
+  .options label {
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+  }
+  
+  /* Disabled state for Next button */
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Highlight correct and incorrect answers after submission */
+  .correct {
+    background-color: #d4edda; /* light green background */
+  }
+  .incorrect {
+    background-color: #f8d7da; /* light red/pink background */
+  }
+  
+  /* Feedback text for incorrect answers */
+  .feedback {
+    margin-top: 5px;
+    font-style: italic;
+    color: #d63301; /* reddish text for feedback */
+  }
