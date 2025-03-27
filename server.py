@@ -21,6 +21,40 @@ table_attempts = dynamodb.Table('mcq-attempts')
 
 app = Flask(__name__)
 
+@app.route('/questionset/batch', methods=['POST'])
+def create_questionset_with_questions():
+    data = request.json
+
+    # Extract questionset details
+    questionset_id = data['questionsetid']
+    name = data['name']
+    description = data['description']
+    questions = data['questions']
+
+    # Insert into questionsets table
+    questionset_item = {
+        'questionsetId': questionset_id,
+        'name': name,
+        'description': description,
+        'timestamp': datetime.now(timezone.utc).isoformat()
+    }
+    table.put_item(Item=questionset_item)
+
+    # Insert into questions table
+    for idx, question in enumerate(questions, start=1):
+        question_id = f"question-{idx}"
+        question_item = {
+            'questionsetId': questionset_id,
+            'questionId': question_id,
+            'text': question['text'],
+            'choices': question['choices'],
+            'tags': question.get('tags', []),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+        table_questions.put_item(Item=question_item)
+
+    return jsonify({"message": "Questionset and questions inserted successfully."}), 201
+
 @app.route('/questionsets', methods=['GET'])
 def get_questionsets():
     # Scan the table to get all records
@@ -68,3 +102,40 @@ def serve_static(filename):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
+
+""" 
+We need to write an endpoint that inserts 
+- 1 record in the questionsets table (patritionkey :questionsetId)
+- & multiple records in the questions table  (patritionkey :questionsetId , sort key :questionId)
+    - generate counter questionId
+The client will send below request :  
+
+POST /mcquery/v1/questionset/batch HTTP/1.1
+Content-Type: application/json
+Kong-Apikey: nXh1Le1zKx5eZ6UnViAUQuPyLFXWVizO
+Host: kong-5e30d406e3usadj2j.kongcloud.dev
+Content-Length: 741
+
+{
+  "questionsetid": "dynamodb-basics-2503151722",
+  "name": "DynamoDB Advanced Use Cases Quiz 3",
+  "description": "A set of questions to test knowledge on advanced features and use cases of Amazon DynamoDB.",
+  "questions": [
+    {
+      "text": "How do DynamoDB transactions ensure atomicity and consistency?",
+      "choices": [
+        {
+          "text": "By allowing multiple operations to be executed atomically with ACID guarantees.",
+          "targetedResponse": "Correct! DynamoDB transactions ensure all-or-nothing execution of multiple operations, maintaining atomicity and consistency.",
+          "isCorrect": true
+        }
+      ],
+      "tags": [
+        "acid",
+        "dynamodb",
+        "atomicity"
+      ]
+    }
+  ]
+}
+"""
