@@ -113,7 +113,7 @@ async function loadQuiz(questionsetId) {
 
         // Question text
         const questionElem = document.createElement('p');
-        questionElem.textContent = q.questionText;
+        questionElem.textContent = q.text;
         slide.appendChild(questionElem);
 
         slide.appendChild(document.createElement('br'));
