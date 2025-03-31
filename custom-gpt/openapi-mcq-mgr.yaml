@@ -1,0 +1,114 @@
+openapi: 3.1.0
+info:
+  title: MCQ Manager Developer APIs
+  description: API to create multiple-choice questions (MCQs) with targeted feedback for choices.
+  version: 1.0.0
+  contact :
+    email : sagarmmhatre@yahoo.co.in
+servers:
+  - url: https://API_GATEWAY.execute-api.REGION.amazonaws.com/v1
+paths:
+  /questionset/batch:
+    post:
+      operationId: create-questionset
+      description: Endpoint to create a new multiple-choice questionset with targeted feedback for each choice & submit it to the backend. This operation should be triggered after the CustomGPT has generated 10 MCQ questions based upon the conversation until now, to help the user test their understanding.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                questionsetid:
+                  type: string
+                  description: Unique identifier for the questionset. Must have -YYMMDDhhss as the suffix.
+                  example: aws-api-gateway-2503151722
+                name:
+                  type: string
+                  description: Name of the questionset.
+                  example: AWS API Gateway Scenario-Based Questions
+                description:
+                  type: string
+                  description: Description of the questionset.
+                  example: This set of scenario-based multiple-choice questions is designed to test and reinforce your understanding of AWS API Gateway functionality. It challenges you to apply concepts in real-world contexts, helping deepen your practical knowledge of API Gateway.
+                questions:
+                  type: array
+                  description: List of questions in the questionset.
+                  items:
+                    type: object
+                    properties:
+                      text:
+                        type: string
+                        description: The text of the question. Ideally should be a scenario-based question. Use well-formatted plain text with escaped special characters.
+                        example: Your company is using AWS API Gateway to expose a REST API for a backend service. During a load test, you notice that some requests are being throttled. What is the most likely cause, and how can you resolve it?
+                      choices:
+                        type: array
+                        description: List of choices for the question. Always shuffle the choices so that the correct answer is at a different index for each question.
+                        items:
+                          type: object
+                          properties:
+                            text:
+                              type: string
+                              description: The text of the choice.
+                              examples: 
+                                - The API Gateway has reached its account-level throttling limit. Increase the account-level throttling quota in the API Gateway settings.
+                                - The backend service is overloaded. Scale the backend service to handle more requests.
+                                - The API Gateway stage-level throttling limit is being exceeded. Update the stage-level throttling settings to allow more requests per second.
+                                - The API Gateway is misconfigured. Check the integration settings and ensure the backend service is reachable.
+                            targetedResponse:
+                              type: string
+                              description: Feedback provided when this choice is selected. If this is a wrong choice, it should mentor the user to understand why the choice is wrong. Use well-formatted plain text with escaped special characters.
+                              examples: 
+                                - Incorrect. Account-level throttling limits are rarely the cause unless multiple APIs are being used simultaneously. Focus on stage-level or method-level throttling.
+                                - Incorrect. While backend service scaling is important, throttling in API Gateway is unrelated to backend service capacity.
+                                - Correct! Stage-level throttling limits are commonly configured to control request rates. Increasing the limit can resolve the issue.
+                                - Incorrect. Misconfiguration of integration settings would result in 5XX errors, not throttling.
+                            isCorrect:
+                              type: boolean
+                              description: Indicates if the choice is correct.
+                              examples: 
+                                - false
+                                - true
+                      tags:
+                        type: array
+                        description: List of tags for the question. All tags must be in lower case. These will be keywords from the text of the question or from the text of the right or wrong choice.
+                        items:
+                          type: string
+                        maxItems: 10
+                        example: ["api gateway", "throttling", "stage-level throttling", "backend service"]
+      responses:
+        '200':
+          description: Questionset created successfully.
+        '400':
+          description: Bad request. Invalid input data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message.
+                    example: Invalid input data.
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message.
+                    example: Internal server error.
+components:
+  schemas: {}  
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+security:
+  - ApiKeyAuth: []
