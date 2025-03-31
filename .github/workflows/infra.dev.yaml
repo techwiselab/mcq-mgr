@@ -4,7 +4,7 @@ name: mcq-mgr.infra
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
       - "infra/**"
       - "!**/README.md"
@@ -34,7 +34,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -backend-config="bucket=terraform-on-aws-eks-sagar-2024" -backend-config="key=dev/mcq-mgr" -backend-config="region=us-east-2" -backend-config="dynamodb_table=dev-mcq-mgr"
+        run: terraform init         
 
       - name: Terraform Validate
         id: validate
