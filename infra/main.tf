@@ -232,7 +232,7 @@ resource "aws_api_gateway_deployment" "mcq_api_deployment" {
   
 }
 
-resource "aws_api_gateway_stage" "mcq_api_gateway_stage_dev" {
+resource "aws_api_gateway_stage" "mcq_api_gateway_stage" {
       rest_api_id = aws_api_gateway_rest_api.mcq_api.id
       deployment_id = aws_api_gateway_deployment.mcq_api_deployment.id
       stage_name = "v1"
@@ -250,7 +250,7 @@ resource "aws_api_gateway_usage_plan" "mcq_usage_plan" {
 
   api_stages {
     api_id = aws_api_gateway_rest_api.mcq_api.id
-    stage  = aws_api_gateway_stage.mcq_api_gateway_stage_dev.stage_name
+    stage  = aws_api_gateway_stage.mcq_api_gateway_stage.stage_name
   }
 
   throttle_settings {
