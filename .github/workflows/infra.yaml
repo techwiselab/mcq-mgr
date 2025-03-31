@@ -1,0 +1,51 @@
+# Github Actions Workflow file that automates the Terraform workflow.
+name: mcq-mgr.infra
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - "!**/README.md"
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "infra"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.0
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config="bucket=terraform-on-aws-eks-sagar-2024" \
+                            -backend-config="key=dev/mcq-mgr" \
+                            -backend-config="region=us-east-2" \
+                            -backend-config="dynamodb_table=dev-mcq-mgr"
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
