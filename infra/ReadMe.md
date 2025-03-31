@@ -87,3 +87,17 @@ docker run -d -p 5001:5000 --name mcq-tool -e AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID -
 
 
 https://pages.awscloud.com/GLOBAL-other-GC-Traincert-Foundational-and-Associate-Certification-Challenge-2025-reg.html?sc_icampaign=aware_global_200_certification_found-assoc-challenge_1up_tnc&sc_ichannel=ha&sc_icontent=awssm-2022050_aware_tnc&sc_iplace=1up&trk=9047985f-e9d5-42d4-813d-e98786e3b854~ha_awssm-2022050_aware_tnc
+
+## How to destroy locally
+
+```sh
+cd mcq-mgr/infra
+terraform init
+
+terraform plan -destroy 
+
+# Review the above & then ...
+
+terraform destroy
+
+```
