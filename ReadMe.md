@@ -150,7 +150,7 @@ cd app
 
 docker build -t mcq-mgr:1.0 .
 
-# docker rm mcq-mgr -f
+docker rm mcq-mgr -f
 
 docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
 

@@ -46,6 +46,7 @@ function reattemptAll(questionsetId) {
     document.getElementById('dashboard').style.display = 'none';
     // Show the quiz container
     document.getElementById('quiz-container').style.display = 'block';
+    document.getElementById('navigation').style.display = 'block';
     // Load the quiz data (assuming you have a function to load the quiz)
     loadQuiz(questionsetId);
 }
