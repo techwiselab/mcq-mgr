@@ -75,54 +75,59 @@ Expected Output :
 
 ## Step 2 : Set up Custom GPT 
 
+```sh
+cd infra 
+
+API_KEY=$(terraform output -raw mcq_api_key)
+echo $API_URL
+
+API_URL=$(terraform output -raw api_gw_url)
+echo $API_KEY
+
+```
+
+Note down the above values 
+
 Naviagate to https://chatgpt.com/gpts/mine
 
 Create a new (or update your ) Custom GPT  
+In the instructions, add "It can also generate MCQs and submit it to the backend using the API in the Actions"
+
+In the Configure Tab, scroll down to Actions. 
+Click the Create new Action button
+
+In the Authentication Field select 
+
+Authentication Type : API Key 
+Use the value from the above ($API_KEY) & insert it into API Key
+Auth Type : Custom 
+Custom Header Name : x-api-key
 
 
+In the Schema , copy paste the contents from the file [custom-gpt/openapi-mcq-mgr.yaml](./custom-gpt/openapi-mcq-mgr.yaml)
+Replace the URL with the value of the API URL from above 
+e.g
 
+```yaml
+openapi: 3.1.0
+info:
+  title: MCQ Manager Developer APIs
+  description: API to create multiple-choice questions (MCQs) with targeted feedback for choices.
+  version: 1.0.0
+  contact :
+    email : sagarmmhatre@yahoo.co.in
+servers:
+  - url: https://6jdw8ba9u0.execute-api.us-east-2.amazonaws.com/v1
+
+  ...
+
+```
+
+Privacy policy : https://mytest.com
 
 ## Step 3 : Run Web App
 
-### Local Run ( without docker )
-
 ```sh
-
-cd infra
-
-AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
-AWS_SECRET_ACCESS_KEY=$(terraform output -raw mcq_web_ui_secret_access_key)
-AWS_REGION=us-east-2
-
-# echo $AWS_ACCESS_KEY_ID
-# echo $AWS_SECRET_ACCESS_KEY
-
-cd ..
-
-# Navigate to the application directory
-cd app
-
-# Set up virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install required packages
-pip install -r requirements.txt
-
-# Run the Flask server
-python server.py
-```
-
-Navigate to http://localhost:PORT/static/dashboard.html
-
-
-### With Docker 
-
-
-```sh
-
 cd infra
 
 AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
@@ -141,12 +146,22 @@ docker build -t mcq-mgr:1.0 .
 
 # docker rm mcq-tool -f
 
-docker rm -f mcq-mgr
 docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
 
 ```
 
 Navigate to http://localhost:PORT/static/dashboard.html
+
+
+## Usage
+
+ASk a few questions to your custom GPT
+
+Then, use the below prompt : 
+
+Generate 5 scenario-based MCQ questions & submit them to the backend.
+
+In the Web UI , click Submit. To start the Test, click the name of the Test
 
 
 ## AWS resources cleanup 
