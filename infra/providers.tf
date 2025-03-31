@@ -14,8 +14,8 @@ terraform {
   backend "s3" {
     bucket = "terraform-on-aws-eks-sagar-2024"
     key    = "dev/mcq-mgr/terraform.tfstate"
-    region = "us-east-2"
-    
+    region = "us-east-1"
+
     # For State Locking
     dynamodb_table = "dev-mcq-mgr"    
   } 
