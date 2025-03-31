@@ -75,7 +75,9 @@ Expected Output :
 
 ## Step 2 : Set up Custom GPT 
 
+Naviagate to https://chatgpt.com/gpts/mine
 
+Create a new (or update your ) Custom GPT  
 
 
 
@@ -137,9 +139,10 @@ cd app
 
 docker build -t mcq-mgr:1.0 .
 
-docker rm mcq-tool -f
+# docker rm mcq-tool -f
 
-docker run -d -p 5000:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
+docker rm -f mcq-mgr
+docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
 
 ```
 
@@ -152,7 +155,5 @@ Note : Proceed with caution , will permanantly delete your data
 
 ```sh
 cd infra
-terraform plan -destroy 
-# Review the above & then ...
 terraform destroy
 ```
