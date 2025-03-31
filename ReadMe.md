@@ -8,7 +8,8 @@
 
 ## Step 1 : Create AWS resources
 
-Run the Terraform script to create the resources within your AWS Account
+Run the Terraform script to create the resources within your AWS Account.
+This will create 3 DynamoDB Tables, an API Gateway (+ API Key to access it) & a user whose credentials will be used later by the Web UI.
 
 Note : you may optionally change the region in the [infra/terraform.auto.tfvars](./infra/terraform.auto.tfvars) file 
 
@@ -97,15 +98,18 @@ In the Configure Tab, scroll down to Actions.
 Click the Create new Action button
 
 In the Authentication Field select 
+- Authentication Type : API Key 
+- Use the value from the above ($API_KEY) & insert it into API Key
+- Auth Type : Custom 
+- Custom Header Name : x-api-key
 
-Authentication Type : API Key 
-Use the value from the above ($API_KEY) & insert it into API Key
-Auth Type : Custom 
-Custom Header Name : x-api-key
 
+![](./images/auth.png)
 
-In the Schema , copy paste the contents from the file [custom-gpt/openapi-mcq-mgr.yaml](./custom-gpt/openapi-mcq-mgr.yaml)
-Replace the URL with the value of the API URL from above 
+In the Schema , 
+- copy paste the contents from the file [custom-gpt/openapi-mcq-mgr.yaml](./custom-gpt/openapi-mcq-mgr.yaml)
+- Replace the URL with the value of the API URL from above 
+
 e.g
 
 ```yaml
@@ -124,6 +128,8 @@ servers:
 ```
 
 Privacy policy : https://mytest.com
+
+![](./images/openapi.png)
 
 ## Step 3 : Run Web App
 
@@ -144,18 +150,18 @@ cd app
 
 docker build -t mcq-mgr:1.0 .
 
-# docker rm mcq-tool -f
+# docker rm mcq-mgr -f
 
 docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
 
 ```
 
-Navigate to http://localhost:PORT/static/dashboard.html
+Navigate to http://localhost:5002/static/dashboard.html
 
 
 ## Usage
 
-ASk a few questions to your custom GPT
+Ask a few questions to your custom GPT
 
 Then, use the below prompt : 
 
