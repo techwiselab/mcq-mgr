@@ -280,7 +280,7 @@ async function submitQuiz() {
         const correctIdx = q.choices.findIndex(answerObj => answerObj.isCorrect);
         const userIdx = userAnswers[index];
         const result = {
-            question: q.questionText,
+            question: q.text,
             choices: q.choices,
             correctIdx: correctIdx,
             userIdx: userIdx

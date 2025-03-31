@@ -172,7 +172,7 @@ resource "aws_api_gateway_integration" "post_batch" {
           "Item": {
             "questionsetId": {"S": "$inputRoot.questionsetid"},
             "questionId": {"S": "$foreach.index"},
-            "questionText": {"S": "$q.text"},
+            "text": {"S": "$q.text"},
             "tags": {
               "L": [
                 #foreach($tag in $q.tags)
