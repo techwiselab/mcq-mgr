@@ -1,5 +1,5 @@
 output "api_gw_url" {
-  value = aws_api_gateway_stage.mcq_api_gateway_stage_dev.invoke_url
+  value = aws_api_gateway_stage.mcq_api_gateway_stage.invoke_url
 }
 
 output "mcq_web_ui_access_key_id" {
