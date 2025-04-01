@@ -1,12 +1,27 @@
+## Fine-Tune Your Certification Prep with AI-Generated MCQs
 
-## Prerequisites
+Get ready for your next professional certification exam—whether it’s AWS, Azure, GCP, or more—with OpenAI-powered, scenario-based MCQs designed to match real exam objectives.
+
+Here’s how it works:
+	1.	🔧 Create a custom GPT focused on your certification’s exam guide
+	2.	🔄 Connect it with an action (API) to submit MCQs to your database
+	3.	💻 Practice on a local web UI
+	4.	📊 Analyze your results and refocus your efforts on weak areas
+
+Let’s make prep smarter, faster, and more focused.
+
+Happy Learning!
+
+<hr>
+
+### Prerequisites
 
 1. AWS Account ,  [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 
 2. Terraform 
 3. Git 
 4. ChatGPT Plus / Pro Subscription 
 
-## Step 1 : Create AWS resources
+### Step 1 : Create AWS resources
 
 Run the Terraform script to create the resources within your AWS Account.
 This will create 3 DynamoDB Tables, an API Gateway (+ API Key to access it) & a user whose credentials will be used later by the Web UI.
@@ -19,7 +34,7 @@ terraform init
 terraform apply
 ```
 
-### Test
+#### Test
 
 Wait for a few (3-5) mins & then run the below to test if the API is operational
 
@@ -74,7 +89,7 @@ Expected Output :
 { "UnprocessedItems":{} }
 ```
 
-## Step 2 : Set up Custom GPT 
+### Step 2 : Set up Custom GPT 
 
 ```sh
 # cd infra 
@@ -134,7 +149,7 @@ Privacy policy : https://mytest.com
 
 ![](./images/openapi.png)
 
-## Step 3 : Run Web App
+### Step 3 : Run Web App
 
 ```sh
 # cd infra
@@ -175,7 +190,7 @@ Generate 5 scenario-based MCQ questions & submit them to the backend.
 In the Web UI , click Refresh. To start the Test, click the name of the Test
 
 
-## AWS resources cleanup 
+### AWS resources cleanup 
 
 Note : Proceed with caution , will permanantly delete your data
 
@@ -183,3 +198,23 @@ Note : Proceed with caution , will permanantly delete your data
 cd infra
 terraform destroy
 ```
+
+## Architecture :
+
+Hybrid Cloud [ AWS + (on-prem = our local machine :) ) ]
+  - AWS Serverless
+    - API Gateway
+      - Provides a REST API to insert Question Set
+      - Secured Key based Authentication
+    - DynamoDB Tables
+      - Stores Question sets, Questions & score for the latest attempt
+  - Local Docker
+    - Python Backend
+      - REST endpoint for CRUD operations on the DynamoDB Table
+      - Secured access to DynamoDB Tables via API Keys 
+    - HTML , Javascript Frontend
+      - Provides UI for practicing exam
+      - Tabular Report based on lattest attempts
+
+
+![](./images/mcq-mgr-architecture.png)
