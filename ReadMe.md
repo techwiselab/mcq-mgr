@@ -77,7 +77,7 @@ Expected Output :
 ## Step 2 : Set up Custom GPT 
 
 ```sh
-cd infra 
+# cd infra 
 
 API_KEY=$(terraform output -raw mcq_api_key)
 echo $API_URL
@@ -92,17 +92,20 @@ Note down the above values
 Naviagate to https://chatgpt.com/gpts/mine
 
 Create a new (or update your ) Custom GPT  
-In the instructions, add "It can also generate MCQs and submit it to the backend using the API in the Actions"
+In the instructions, add : 
+
+```txt
+It can also generate MCQs and submit it to the backend using the API in the Actions
+```
 
 In the Configure Tab, scroll down to Actions. 
 Click the Create new Action button
 
-In the Authentication Field select 
+In the Authentication Field,   
 - Authentication Type : API Key 
 - Use the value from the above ($API_KEY) & insert it into API Key
 - Auth Type : Custom 
 - Custom Header Name : x-api-key
-
 
 ![](./images/auth.png)
 
@@ -134,7 +137,7 @@ Privacy policy : https://mytest.com
 ## Step 3 : Run Web App
 
 ```sh
-cd infra
+# cd infra
 
 AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
 AWS_SECRET_ACCESS_KEY=$(terraform output -raw mcq_web_ui_secret_access_key)
@@ -165,9 +168,11 @@ Ask a few questions to your custom GPT
 
 Then, use the below prompt : 
 
+```txt
 Generate 5 scenario-based MCQ questions & submit them to the backend.
+```
 
-In the Web UI , click Submit. To start the Test, click the name of the Test
+In the Web UI , click Refresh. To start the Test, click the name of the Test
 
 
 ## AWS resources cleanup 

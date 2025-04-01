@@ -28,7 +28,7 @@ paths:
                 name:
                   type: string
                   description: Name of the questionset.
-                  example: AWS API Gateway Scenario-Based Questions
+                  example: AWS API Gateway
                 description:
                   type: string
                   description: Description of the questionset.
@@ -53,18 +53,14 @@ paths:
                               type: string
                               description: The text of the choice.
                               examples: 
-                                - The API Gateway has reached its account-level throttling limit. Increase the account-level throttling quota in the API Gateway settings.
                                 - The backend service is overloaded. Scale the backend service to handle more requests.
                                 - The API Gateway stage-level throttling limit is being exceeded. Update the stage-level throttling settings to allow more requests per second.
-                                - The API Gateway is misconfigured. Check the integration settings and ensure the backend service is reachable.
                             targetedResponse:
                               type: string
                               description: Feedback provided when this choice is selected. If this is a wrong choice, it should mentor the user to understand why the choice is wrong. Use well-formatted plain text with escaped special characters.
                               examples: 
-                                - Incorrect. Account-level throttling limits are rarely the cause unless multiple APIs are being used simultaneously. Focus on stage-level or method-level throttling.
                                 - Incorrect. While backend service scaling is important, throttling in API Gateway is unrelated to backend service capacity.
                                 - Correct! Stage-level throttling limits are commonly configured to control request rates. Increasing the limit can resolve the issue.
-                                - Incorrect. Misconfiguration of integration settings would result in 5XX errors, not throttling.
                             isCorrect:
                               type: boolean
                               description: Indicates if the choice is correct.
