@@ -3,10 +3,10 @@
 Get ready for your next professional certification exam—whether it’s AWS, Azure, GCP, or more—with OpenAI-powered, scenario-based MCQs designed to match real exam objectives.
 
 Here’s how it works:
-	1.	🔧 Create a custom GPT focused on your certification’s exam guide
-	2.	🔄 Connect it with an action (API) to submit MCQs to your database
-	3.	💻 Practice on a local web UI
-	4.	📊 Analyze your results and refocus your efforts on weak areas
+1.	🔧 Create a custom GPT focused on your certification’s exam guide
+2.	🔄 Connect it with an action (API) to submit MCQs to your database
+3.	💻 Practice on a local web UI
+4.	📊 Analyze your results and refocus your efforts on weak areas
 
 Let’s make prep smarter, faster, and more focused.
 
