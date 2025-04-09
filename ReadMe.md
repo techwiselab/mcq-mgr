@@ -45,12 +45,11 @@ API_URL=$(terraform output -raw api_gw_url)
 
 # echo $API_URL
 # echo $API_KEY
-
+#    --header "x-api-key:$API_KEY" \
 curl --request POST "$API_URL/questionset/batch" \
   --header "Content-Type: application/json" \
-  --header "x-api-key:$API_KEY" \
   --data '{
-"questionsetid": "api-test-2503151722",
+"questionsetid": "api-test-2503151724",
   "name": "AWS API GW Test",
   "description": "A set of questions to test knowledge on advanced features and use cases of AWS API Gateway.",
   "questions": [    
@@ -89,7 +88,44 @@ Expected Output :
 { "UnprocessedItems":{} }
 ```
 
-### Step 2 : Set up Custom GPT 
+### Step 2 : Build & Run the MCP Server
+
+
+```sh
+clear
+cd infra
+
+AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
+AWS_SECRET_ACCESS_KEY=$(terraform output -raw mcq_web_ui_secret_access_key)
+AWS_REGION=us-east-2
+
+# echo $AWS_ACCESS_KEY_ID
+# echo $AWS_SECRET_ACCESS_KEY
+
+cd ..
+
+# Navigate to the application directory
+cd mcp-server
+
+echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID > .env
+echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> .env
+echo AWS_REGION=us-east-1 >> .env
+
+cat .env
+
+docker build -t mcp-server:1.0 .
+
+# rm .env
+
+docker rm mcp-server -f
+
+docker run -d --name mcp-server mcp-server:1.0 
+
+# docker run -d --name mcp-server -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcp-server:1.0 
+
+```
+
+### Step 3 : Set up Custom GPT 
 
 ```sh
 # cd infra 
@@ -172,6 +208,10 @@ docker rm mcq-mgr -f
 
 docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
 
+docker run -d --name mcp-server -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcp-server:1.0 
+
+open http://localhost:5002/static/dashboard.html
+
 ```
 
 Navigate to http://localhost:5002/static/dashboard.html
@@ -218,3 +258,20 @@ Hybrid Cloud [ AWS + (on-prem = our local machine :) ) ]
 
 
 ![](./images/mcq-mgr-architecture.png)
+
+
+```sh
+
+terraform state list
+
+terraform state show aws_iam_policy.mcq_apigw_dynamodb
+
+terraform taint module.iam_user_module.aws_iam_access_key.mcq_web_ui_access_key
+terraform apply
+
+terraform state rm 
+
+# aws_api_gateway_usage_plan.mcq_usage_plan
+# aws_api_gateway_usage_plan_key.mcq_usage_plan_key
+
+```
