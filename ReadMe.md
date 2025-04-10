@@ -33,10 +33,11 @@ cd infra
 terraform init
 terraform apply
 ```
-### Step 2 : Build & Run the MCP Server
+### Step 2 : Build the MCP Server
 
 Note : Update the AWS Region Appropriately
 
+We first generate a .env file 
 ```sh
 AWS_REGION=us-east-2
 
@@ -56,7 +57,10 @@ cd mcp-server
 echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID > .env
 echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> .env
 echo AWS_REGION=us-east-2 >> .env
+```
 
+Build the image
+```sh
 # cat .env
 
 docker rm mcq-mcp-server -f
@@ -68,7 +72,11 @@ docker build -t mcq-mcp-server:1.0 .
 # TODO : Find a more secure way to handle credentials. For now, managing via .env file. 
 # Delete .env file after image is generated
 rm .env
+```
 
+Test our image 
+
+```sh
 docker run -d --name mcq-mcp-server mcq-mcp-server:1.0 
 
 # Check ...
@@ -108,14 +116,12 @@ Restart Claude . It will show the docker container starting
 ```sh
 # Check ...
 docker container ls -n 1
-
 ```
 
 ![](./images/claude-tools-available-1.png)
 
 
 ![](./images/claude-tools-available-2.png)
-```
 
 ### Step 4 : Run Web App
 
@@ -162,7 +168,6 @@ In the Web UI , click Refresh. To start the Test, click the name of the Test
 #### Optional : Create Style in Claude
 
 ```txt
-
 Audience are Software professional preparing for the AWS Solutions Architect Associate certification exam. They prefer clear explanations, practice questions, and guidance tailored to the topics covered in the SAA-C03 exam - AWS services, architecture best practices, and core concepts like high availability, fault tolerance, cost optimization, and security. Use real-world examples and visual aids when helpful, and adapt explanations to the user's technical level and learning style. Avoids outdated content and focus only on what's relevant to the Associate-level exam. 
 ```
 
