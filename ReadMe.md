@@ -90,14 +90,15 @@ Expected Output :
 
 ### Step 2 : Build & Run the MCP Server
 
+Update the AWS REgion Appropriately
 
 ```sh
-clear
+AWS_REGION=us-east-2
+
 cd infra
 
 AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
 AWS_SECRET_ACCESS_KEY=$(terraform output -raw mcq_web_ui_secret_access_key)
-AWS_REGION=us-east-2
 
 # echo $AWS_ACCESS_KEY_ID
 # echo $AWS_SECRET_ACCESS_KEY
@@ -109,19 +110,17 @@ cd mcp-server
 
 echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID > .env
 echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> .env
-echo AWS_REGION=us-east-1 >> .env
+echo AWS_REGION=us-east-2 >> .env
 
 cat .env
-
+# docker image rm mcp-server:1.0 
 docker build -t mcp-server:1.0 .
-
-# rm .env
+rm .env
 
 docker rm mcp-server -f
+docker rm mcp-server-claude -f
 
 docker run -d --name mcp-server mcp-server:1.0 
-
-# docker run -d --name mcp-server -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcp-server:1.0 
 
 ```
 
