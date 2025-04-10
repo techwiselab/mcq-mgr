@@ -23,7 +23,7 @@ class Choice(BaseModel):
             ]
         )
     ]
-    targeted_response: Annotated[
+    targetedResponse: Annotated[
         str,
         Field(
             description="Feedback provided when this choice is selected. If this is a wrong choice, it should mentor the user to understand why the choice is wrong. Use well-formatted plain text with escaped special characters.",
@@ -33,7 +33,7 @@ class Choice(BaseModel):
             ]
         )
     ]
-    is_correct: Annotated[
+    isCorrect: Annotated[
         bool,
         Field(
             description="Indicates if the choice is correct.",
@@ -45,11 +45,6 @@ class Choice(BaseModel):
 class Question(BaseModel):
     """
     Represents a question in the questionset.
-
-    Attributes:
-        text (str): The text of the question.
-        choices (List[Choice]): A list of choices for the question.
-        tags (Optional[List[str]]): A list of tags for the question.
     """
     text: Annotated[
         str,
@@ -103,12 +98,6 @@ class Questionset(BaseModel):
     ]
     questions: Annotated[list[Question], Field(max_length=10, description="List of questions in the questionset.")] 
 
-class ShrimpTank(BaseModel):
-    class Shrimp(BaseModel):
-        name: Annotated[str, Field(max_length=10)]
-
-    shrimp: list[Shrimp]
-
 # Load environment variables from the .env file
 load_dotenv()
 
@@ -134,14 +123,6 @@ print('Starting server ...')
 mcp = FastMCP("Terminal Server")
 
 
-@mcp.tool()
-def name_shrimp(
-    tank: ShrimpTank,
-    # You can use pydantic Field in function signatures for validation.
-    extra_names: Annotated[list[str], Field(max_length=10)],
-) -> list[str]:
-    """List all shrimp names in the tank"""
-    return [shrimp.name for shrimp in tank.shrimp] + extra_names
 @mcp.tool()
 def create_questionset_with_questions(tool_input: Questionset) -> Dict[str, str]:
     """
