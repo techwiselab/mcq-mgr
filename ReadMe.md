@@ -117,13 +117,6 @@ docker container ls -n 1
 ![](./images/claude-tools-available-2.png)
 ```
 
-Optional : Create Style
-
-```txt
-
-Audience are Software professional preparing for the AWS Solutions Architect Associate certification exam. They prefer clear explanations, practice questions, and guidance tailored to the topics covered in the SAA-C03 exam - AWS services, architecture best practices, and core concepts like high availability, fault tolerance, cost optimization, and security. Use real-world examples and visual aids when helpful, and adapt explanations to the user's technical level and learning style. Avoids outdated content and focus only on what's relevant to the Associate-level exam. 
-```
-
 ### Step 4 : Run Web App
 
 ```sh
@@ -157,9 +150,7 @@ Navigate to http://localhost:5002/static/dashboard.html
 
 ## Usage
 
-Ask a few questions to your custom GPT
-
-Then, use the below prompt : 
+Ask a few questions in Claude. Then, use the below prompt : 
 
 ```txt
 Generate 5 scenario-based MCQ questions & submit them to the backend.
@@ -168,48 +159,13 @@ Generate 5 scenario-based MCQ questions & submit them to the backend.
 In the Web UI , click Refresh. To start the Test, click the name of the Test
 
 
-### AWS resources cleanup 
+#### Optional : Create Style in Claude
 
-Note : Proceed with caution , will permanantly delete your data
+```txt
 
-```sh
-cd infra
-terraform destroy
+Audience are Software professional preparing for the AWS Solutions Architect Associate certification exam. They prefer clear explanations, practice questions, and guidance tailored to the topics covered in the SAA-C03 exam - AWS services, architecture best practices, and core concepts like high availability, fault tolerance, cost optimization, and security. Use real-world examples and visual aids when helpful, and adapt explanations to the user's technical level and learning style. Avoids outdated content and focus only on what's relevant to the Associate-level exam. 
 ```
 
-## Architecture :
+## Other Versions 
 
-Hybrid Cloud [ AWS + (on-prem = our local machine :) ) ]
-  - AWS Serverless
-    - API Gateway
-      - Provides a REST API to insert Question Set
-      - Secured Key based Authentication
-    - DynamoDB Tables
-      - Stores Question sets, Questions & score for the latest attempt
-  - Local Docker
-    - Python Backend
-      - REST endpoint for CRUD operations on the DynamoDB Table
-      - Secured access to DynamoDB Tables via API Keys 
-    - HTML , Javascript Frontend
-      - Provides UI for practicing exam
-      - Tabular Report based on lattest attempts
-
-
-![](./images/mcq-mgr-architecture.png)
-
-
-```sh
-
-terraform state list
-
-terraform state show aws_iam_policy.mcq_apigw_dynamodb
-
-terraform taint module.iam_user_module.aws_iam_access_key.mcq_web_ui_access_key
-terraform apply
-
-terraform state rm 
-
-# aws_api_gateway_usage_plan.mcq_usage_plan
-# aws_api_gateway_usage_plan_key.mcq_usage_plan_key
-
-```
+[OpenAI ( non-MCP ) + AWS API Gateway](https://github.com/techwiselab/mcq-mgr/tree/openai)
