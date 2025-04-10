@@ -4,7 +4,7 @@ Get ready for your next professional certification exam—whether it’s AWS, Az
 
 Here’s how it works:
 1.	🔧 Instantiate MCP Server 
-2.	🔄 Connect Claude to MCP Server - enable it to submit MCQs to your database
+2.	🔄 Connect Claude to MCP Server - enable it to submit MCQs to our database
 3.	💻 Practice on a local web UI
 4.	📊 Analyze your results and refocus your efforts on weak areas
 
@@ -89,7 +89,7 @@ docker rm mcq-mcp-server -f
 
 ### Step 3 : Set up Claude
 
-Claude > Settings > DEveloper > Edit Config 
+Claude > Settings > Developer > Edit Config 
 
 ```js
 {
@@ -117,6 +117,8 @@ Restart Claude . It will show the docker container starting
 # Check ...
 docker container ls -n 1
 ```
+
+Explore our MCP tool in Calude 
 
 ![](./images/claude-tools-available-1.png)
 
