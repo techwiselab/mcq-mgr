@@ -61,7 +61,7 @@ echo AWS_REGION=us-east-2 >> .env
 
 docker rm mcq-mcp-server -f
 docker rm mcq-mcp-server-claude -f
-docker image rm mcp-server:1.0 
+docker image rm mcq-mcp-server:1.0 
 
 docker build -t mcq-mcp-server:1.0 .
 
