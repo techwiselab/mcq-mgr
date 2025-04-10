@@ -3,8 +3,8 @@
 Get ready for your next professional certification exam—whether it’s AWS, Azure, GCP, or more—with OpenAI-powered, scenario-based MCQs designed to match real exam objectives.
 
 Here’s how it works:
-1.	🔧 Create a custom GPT focused on your certification’s exam guide
-2.	🔄 Connect it with an action (API) to submit MCQs to your database
+1.	🔧 Instantiate MCP Server 
+2.	🔄 Connect Claude to MCP Server - enable it to submit MCQs to your database
 3.	💻 Practice on a local web UI
 4.	📊 Analyze your results and refocus your efforts on weak areas
 
@@ -16,15 +16,15 @@ Happy Learning!
 
 ### Prerequisites
 
-1. AWS Account ,  [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 
+1. AWS Account , [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 
 2. Terraform 
-3. Git 
-4. ChatGPT Plus / Pro Subscription 
+3. [Claude](https://claude.ai/download)
+4. Docker
 
 ### Step 1 : Create AWS resources
 
 Run the Terraform script to create the resources within your AWS Account.
-This will create 3 DynamoDB Tables, an API Gateway (+ API Key to access it) & a user whose credentials will be used later by the Web UI.
+This will create 3 DynamoDB Tables & a user whose credentials will be used later by the MCP & the Web UI.
 
 Note : you may optionally change the region in the [infra/terraform.auto.tfvars](./infra/terraform.auto.tfvars) file 
 
@@ -33,69 +33,14 @@ cd infra
 terraform init
 terraform apply
 ```
-
-#### Test
-
-Wait for a few (3-5) mins & then run the below to test if the API is operational
-
-```sh
-
-API_KEY=$(terraform output -raw mcq_api_key)
-API_URL=$(terraform output -raw api_gw_url)
-
-# echo $API_URL
-# echo $API_KEY
-#    --header "x-api-key:$API_KEY" \
-curl --request POST "$API_URL/questionset/batch" \
-  --header "Content-Type: application/json" \
-  --data '{
-"questionsetid": "api-test-2503151724",
-  "name": "AWS API GW Test",
-  "description": "A set of questions to test knowledge on advanced features and use cases of AWS API Gateway.",
-  "questions": [    
-    {
-      "text": "What is the primary purpose of AWS API Gateway?",
-      "choices": [
-        {
-          "text": "To create, publish, maintain, monitor, and secure APIs at any scale.",
-          "targetedResponse": "Correct! AWS API Gateway is a fully managed service that makes it easy to create and manage APIs.",
-          "isCorrect": true
-        },
-        {
-          "text": "To store and retrieve data with low latency.",
-          "targetedResponse": "Incorrect. This describes Amazon DynamoDB, not API Gateway.",
-          "isCorrect": false
-        },
-        {
-          "text": "To manage serverless compute resources.",
-          "targetedResponse": "Incorrect. This describes AWS Lambda, not API Gateway.",
-          "isCorrect": false
-        }
-      ],
-      "tags": [
-        "api-gateway",
-        "aws",
-        "serverless"
-      ]
-    }
-  ]
-}'
-```
-
-Expected Output :
-
-```json
-{ "UnprocessedItems":{} }
-```
-
 ### Step 2 : Build & Run the MCP Server
 
-Update the AWS REgion Appropriately
+Note : Update the AWS Region Appropriately
 
 ```sh
 AWS_REGION=us-east-2
 
-cd infra
+# cd infra
 
 AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
 AWS_SECRET_ACCESS_KEY=$(terraform output -raw mcq_web_ui_secret_access_key)
@@ -112,81 +57,77 @@ echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID > .env
 echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> .env
 echo AWS_REGION=us-east-2 >> .env
 
-cat .env
-# docker image rm mcp-server:1.0 
-docker build -t mcp-server:1.0 .
+# cat .env
+
+docker rm mcq-mcp-server -f
+docker rm mcq-mcp-server-claude -f
+docker image rm mcp-server:1.0 
+
+docker build -t mcq-mcp-server:1.0 .
+
+# TODO : Find a more secure way to handle credentials. For now, managing via .env file. 
+# Delete .env file after image is generated
 rm .env
 
-docker rm mcp-server -f
-docker rm mcp-server-claude -f
+docker run -d --name mcq-mcp-server mcq-mcp-server:1.0 
 
-docker run -d --name mcp-server mcp-server:1.0 
+# Check ...
+docker container ls -n 1
+
+# Clean up ( Claude will run it's own container)
+docker rm mcq-mcp-server -f
 
 ```
 
-### Step 3 : Set up Custom GPT 
+### Step 3 : Set up Claude
+
+Claude > Settings > DEveloper > Edit Config 
+
+```js
+{
+  "mcpServers": {    
+    "mcq-docker-shell":
+    {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init", 
+        "--name" , "mcq-mcp-server-claude",
+        "-e", "DOCKER_CONTAINER=true",
+        "mcq-mcp-server:1.0"
+      ]
+    } // , ... Other MCP Servers
+  }
+}
+```
+
+Restart Claude . It will show the docker container starting 
 
 ```sh
-# cd infra 
-
-API_KEY=$(terraform output -raw mcq_api_key)
-echo $API_URL
-
-API_URL=$(terraform output -raw api_gw_url)
-echo $API_KEY
+# Check ...
+docker container ls -n 1
 
 ```
 
-Note down the above values 
+![](./images/claude-tools-available-1.png)
 
-Naviagate to https://chatgpt.com/gpts/mine
 
-Create a new (or update your ) Custom GPT  
-In the instructions, add : 
+![](./images/claude-tools-available-2.png)
+```
+
+Optional : Create Style
 
 ```txt
-It can also generate MCQs and submit it to the backend using the API in the Actions
+
+Audience are Software professional preparing for the AWS Solutions Architect Associate certification exam. They prefer clear explanations, practice questions, and guidance tailored to the topics covered in the SAA-C03 exam - AWS services, architecture best practices, and core concepts like high availability, fault tolerance, cost optimization, and security. Use real-world examples and visual aids when helpful, and adapt explanations to the user's technical level and learning style. Avoids outdated content and focus only on what's relevant to the Associate-level exam. 
 ```
 
-In the Configure Tab, scroll down to Actions. 
-Click the Create new Action button
-
-In the Authentication Field,   
-- Authentication Type : API Key 
-- Use the value from the above ($API_KEY) & insert it into API Key
-- Auth Type : Custom 
-- Custom Header Name : x-api-key
-
-![](./images/auth.png)
-
-In the Schema , 
-- copy paste the contents from the file [custom-gpt/openapi-mcq-mgr.yaml](./custom-gpt/openapi-mcq-mgr.yaml)
-- Replace the URL with the value of the API URL from above 
-
-e.g
-
-```yaml
-openapi: 3.1.0
-info:
-  title: MCQ Manager Developer APIs
-  description: API to create multiple-choice questions (MCQs) with targeted feedback for choices.
-  version: 1.0.0
-  contact :
-    email : sagarmmhatre@yahoo.co.in
-servers:
-  - url: https://6jdw8ba9u0.execute-api.us-east-2.amazonaws.com/v1
-
-  ...
-
-```
-
-Privacy policy : https://mytest.com
-
-![](./images/openapi.png)
-
-### Step 3 : Run Web App
+### Step 4 : Run Web App
 
 ```sh
+# cd ..
 # cd infra
 
 AWS_ACCESS_KEY_ID=$(terraform output -raw mcq_web_ui_access_key_id)
@@ -206,8 +147,6 @@ docker build -t mcq-mgr:1.0 .
 docker rm mcq-mgr -f
 
 docker run -d -p 5002:5000 --name mcq-mgr -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcq-mgr:1.0 
-
-docker run -d --name mcp-server -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e  AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_REGION=$AWS_REGION mcp-server:1.0 
 
 open http://localhost:5002/static/dashboard.html
 
