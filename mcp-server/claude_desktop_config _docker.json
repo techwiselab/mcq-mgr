@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "mcq-docker-shell":
+    {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init", 
+        "--name" , "mcq-mcp-server-claude",
+        "-e", "DOCKER_CONTAINER=true",
+        "mcp-server:1.0"
+      ]
+    }
+  }
+
+}
