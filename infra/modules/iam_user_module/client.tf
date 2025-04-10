@@ -13,7 +13,7 @@ resource "aws_iam_user_policy_attachment" "read_only_access" {
 }
 
 resource "aws_iam_user_policy" "allow_attempts_put" {
-  name   = "AllowAttemptsPut"
+  name   = "AllowDynamoDBPut"
   user   = aws_iam_user.mcq_web_ui.name
   policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,11 @@ resource "aws_iam_user_policy" "allow_attempts_put" {
         Sid      = "VisualEditor0"
         Effect   = "Allow"
         Action   = "dynamodb:PutItem"
-        Resource = "arn:aws:dynamodb:${var.region}:${var.account_number}:table/mcq-attempts"
+        Resource = [
+          "arn:aws:dynamodb:${var.region}:${var.account_number}:table/mcq-attempts",
+          "arn:aws:dynamodb:${var.region}:${var.account_number}:table/mcq-questions",
+          "arn:aws:dynamodb:${var.region}:${var.account_number}:table/mcq-questionsets"
+          ]
       }
     ]
   })
